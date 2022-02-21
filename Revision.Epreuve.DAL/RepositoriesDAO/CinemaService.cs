@@ -1,4 +1,5 @@
-﻿using Revision.Epreuve.DAL.EntitiesDTO;
+﻿using Revision.Epreuve.Common.Repositories;
+using Revision.Epreuve.DAL.EntitiesDTO;
 using Revision.Epreuve.DAL.Handlers;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace Revision.Epreuve.DAL.RepositoriesDAO
 {
-    public class CinemaService : IRepository<CinemaDAL, int>
+    public class CinemaService : ServiceBase, ICinemaRepository<CinemaDAL>
     {
         private string _connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Revision.Epreuve.DataBase;Integrated Security=True";
         public void Delete(int idCinema)
@@ -46,7 +47,7 @@ namespace Revision.Epreuve.DAL.RepositoriesDAO
                     // Cette méthode nécéssite un Return  
                     // Execute Reader car attend un retour de 3 informations. => Création d'un reader + while tant que tu read, retourne la conversion du mapper sinon renvoie null
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read()) return Mapper.convert(reader);
+                    while (reader.Read()) return Mapper.convertToCinema(reader);
                     return null;
                 }
             }
@@ -64,7 +65,7 @@ namespace Revision.Epreuve.DAL.RepositoriesDAO
                     // Execute Reader car attend un retour de 3 informations. => Création d'un reader + while tant que tu read, retourne la conversion du mapper sinon renvoie null
                     // Faire un Yield return pour faire une boucle de chaque élément récupéré !
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read()) yield return Mapper.convert(reader);
+                    while (reader.Read()) yield return Mapper.convertToCinema(reader);
                 }
             }
         }
@@ -114,6 +115,16 @@ namespace Revision.Epreuve.DAL.RepositoriesDAO
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        IEnumerable<CinemaDAL> ICinemaRepository<CinemaDAL>.GetByDiffusion(int id_movie, DateTime DateDiffusion)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerable<CinemaDAL> ICinemaRepository<CinemaDAL>.GetByFilm(int id_movie)
+        {
+            throw new NotImplementedException();
         }
     }
 }

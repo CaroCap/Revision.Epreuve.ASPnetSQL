@@ -6,11 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Revision.Epreuve.Common\Revision.Epreuve.Common.csproj" />
+    <ProjectReference Include="..\Revision.Epreuve.DAL\Revision.Epreuve.DAL.csproj" />
   </ItemGroup>
 
 </Project>
