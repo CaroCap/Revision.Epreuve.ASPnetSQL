@@ -1,6 +1,7 @@
 ﻿using Revision.Epreuve.BLL.Entities;
 using Revision.Epreuve.BLL.Handlers;
 using Revision.Epreuve.Common.Repositories;
+using Revision.Epreuve.Common.RepositoriesDAO;
 using Revision.Epreuve.DAL.EntitiesDTO;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,12 @@ using System.Text;
 
 namespace Revision.Epreuve.BLL.Services
 {
-    public class FilmService : IRepository<FilmBLL, int>
+    public class FilmService : IFilmRepository<FilmBLL>
     {
         // Pour communiquer avec DAL il va falloir utiliser les services de la DAL
-        private readonly IRepository<FilmDAL, int> _filmRepository;
+        private readonly IFilmRepository<FilmDAL> _filmRepository;
 
-        public FilmService(IRepository<FilmDAL, int> repository)
+        public FilmService(IFilmRepository<FilmDAL> repository)
         {
             _filmRepository = repository;
         }
@@ -34,6 +35,11 @@ namespace Revision.Epreuve.BLL.Services
         public IEnumerable<FilmBLL> GetAll()
         {
             return _filmRepository.GetAll().Select( f => f.ToBLL() );
+        }
+
+        public IEnumerable<FilmBLL> GetByYear(int year)
+        {
+            return _filmRepository.GetByYear(year).Select(f => f.ToBLL());
         }
 
         public int Insert(FilmBLL entity)

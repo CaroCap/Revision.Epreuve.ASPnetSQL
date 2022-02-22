@@ -38,5 +38,19 @@ namespace Revision.Epreuve.DAL.Handlers
                 // Ville = (record[nameof(CinemaDAL.Id) is DBNull)? null : (string?)record[nameof(CinemaDAL.Ville)]
             };
         }
+
+        public static DiffusionDAL convertToDiffusion(IDataRecord record)
+        {
+            if (record is null) return null;
+            return new DiffusionDAL
+            {
+                Id = (int)record[nameof(DiffusionDAL.Id)],
+                Cinema_Id = (int)record[nameof(DiffusionDAL.Cinema_Id)],
+                Film_Id = (int)record[nameof(DiffusionDAL.Film_Id)],
+                Date_Diffusion = (record[nameof(DiffusionDAL.Date_Diffusion) is DBNull)? null : (DateTime?)record[nameof(DiffusionDAL.Date_Diffusion)]
+                // Si DB est NULLABLE alors il faut d'abord vérifier pour éviter les erreurs (Test si record nameof est null alors renvoi null sinon renvoie record nameof Parsé )
+                // Ville = (record[nameof(CinemaDAL.Id) is DBNull)? null : (string?)record[nameof(CinemaDAL.Ville)]
+            };
+        }
     }
 }

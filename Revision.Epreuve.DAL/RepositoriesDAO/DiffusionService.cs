@@ -8,22 +8,19 @@ using System.Text;
 
 namespace Revision.Epreuve.DAL.RepositoriesDAO
 {
-    public class CinemaService : ServiceBase, ICinemaRepository<CinemaDAL>
+    public class DiffusionService : ServiceBase, IDiffusionRepository<DiffusionDAL>
     {
-        // Plus besoin de l'écrire dans chaque Service vu que la connection string se trouve dans le ServiceBase
-        //private string _connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Revision.Epreuve.DataBase;Integrated Security=True";
-        public void Delete(int idCinema)
+        public void Delete(int idVar)
         {
-            // Création de Sql Connection
             using (SqlConnection connection = new SqlConnection(_connString))
             {
                 // Création de la commande
                 using (SqlCommand command = connection.CreateCommand())
                 {
                     // écrire la commande
-                    command.CommandText = "DELETE FROM [Cinema] WHERE [Id] = @id";
+                    command.CommandText = "DELETE FROM [Diffusion] WHERE [Id] = @idParam";
                     // Préciser les paramètres
-                    SqlParameter p_id = new SqlParameter() { ParameterName = "id", Value = idCinema };
+                    SqlParameter p_id = new SqlParameter() { ParameterName = "idParam", Value = idVar };
                     // Lier/Associé le paramètre à la commande
                     command.Parameters.Add(p_id);
                     // Ouvrir la connexion
@@ -35,62 +32,57 @@ namespace Revision.Epreuve.DAL.RepositoriesDAO
             }
         }
 
-        public CinemaDAL Get(int idCinema)
+        public DiffusionDAL Get(int id)
         {
             using (SqlConnection connection = new SqlConnection(_connString))
             {
                 using (SqlCommand cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT [Id],[Nom],[Ville] FROM [Cinema] WHERE [Id] = @id";
-                    SqlParameter p_id = new SqlParameter() { ParameterName = "id", Value = idCinema };
+                    cmd.CommandText = "SELECT [Id],[Cinema_Id],[Film_Id],[Date_Diffusion] FROM [Diffusion] WHERE [Id] = @id";
+                    SqlParameter p_id = new SqlParameter() { ParameterName = "id", Value = id };
                     cmd.Parameters.Add(p_id);
                     connection.Open();
                     // Cette méthode nécéssite un Return  
                     // Execute Reader car attend un retour de 3 informations. => Création d'un reader + while tant que tu read, retourne la conversion du mapper sinon renvoie null
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read()) return Mapper.convertToCinema(reader);
+                    while (reader.Read()) return Mapper.convertToDiffusion(reader);
                     return null;
                 }
             }
         }
 
-        public IEnumerable<CinemaDAL> GetAll()
+        public IEnumerable<DiffusionDAL> GetAll()
         {
             using (SqlConnection connection = new SqlConnection(_connString))
             {
                 using (SqlCommand cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT [Id],[Nom],[Ville] FROM [Cinema]";
+                    cmd.CommandText = "SELECT [Id],[Cinema_Id],[Film_Id],[Date_Diffusion] FROM [Diffusion]";
                     connection.Open();
                     // Cette méthode nécéssite un Return  
                     // Execute Reader car attend un retour de 3 informations. => Création d'un reader + while tant que tu read, retourne la conversion du mapper sinon renvoie null
                     // Faire un Yield return pour faire une boucle de chaque élément récupéré !
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read()) yield return Mapper.convertToCinema(reader);
+                    while (reader.Read()) yield return Mapper.convertToDiffusion(reader);
                 }
             }
         }
 
-        public int Insert(CinemaDAL entity)
+        public int Insert(DiffusionDAL entity)
         {
             using (SqlConnection connection = new SqlConnection(_connString))
             {
                 using (SqlCommand cmd = connection.CreateCommand())
                 {
-                    // AVEC PROCEDURE STOCKEE (1. Définir le Type // 2. appeler la procédure stockée)
-                    //cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    //cmd.CommandText = "SP_Film_Insert";
-                    //SqlParameter p_nom = new SqlParameter("nom", entity.Nom);
-                    //SqlParameter p_ville = new SqlParameter("ville", entity.Ville);
-                    //cmd.Parameters.Add(p_nom);
-                    //cmd.Parameters.Add(p_ville);
 
                     // OUTPUT pour récupérer l'ID qui a été créé automatiquement via l'incrémentation
-                    cmd.CommandText = "INSERT INTO [Cinema] ([Nom],[Ville]) OUTPUT [inserted].[Id] VALUES (@nom, @ville)";
-                    SqlParameter p_nom = new SqlParameter() { ParameterName= "nom", Value = entity.Nom };
-                    SqlParameter p_ville = new SqlParameter() { ParameterName= "ville", Value = entity.Ville };
-                    cmd.Parameters.Add(p_nom);
-                    cmd.Parameters.Add(p_ville);
+                    cmd.CommandText = "INSERT INTO [Diffusion] ([Cinema_Id],[Film_Id], [Date_Diffusion) OUTPUT [inserted].[Id] VALUES (@cinema_id, @film_id, @dateDiffusion)";
+                    SqlParameter p_cine = new SqlParameter() { ParameterName = "cinema_id", Value = entity.Cinema_Id };
+                    SqlParameter p_film = new SqlParameter() { ParameterName = "film_id", Value = entity.Film_Id };
+                    SqlParameter p_dateDiff = new SqlParameter() { ParameterName = "dateDiffusion", Value = entity.Date_Diffusion };
+                    cmd.Parameters.Add(p_cine);
+                    cmd.Parameters.Add(p_film);
+                    cmd.Parameters.Add(p_dateDiff);
                     connection.Open();
                     // Cette méthode nécéssite un Return car attend un retour en INT donc il faut parser (int) 
                     // Execute Scalar car attente d'une seule réponse. (retour d'un objet donc besoin de parser en int pour récupérer le bon retour)
@@ -99,33 +91,25 @@ namespace Revision.Epreuve.DAL.RepositoriesDAO
             }
         }
 
-        public void Update(int idCinema, CinemaDAL entity)
+        public void Update(int id, DiffusionDAL entity)
         {
             using (SqlConnection connection = new SqlConnection(_connString))
             {
                 using (SqlCommand cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "UPDATE [Cinema] SET [Nom] = @nom, [Ville] = @ville WHERE [Id] = @idCinema";
-                    SqlParameter p_nom = new SqlParameter() { ParameterName = "nom", Value = entity.Nom };
-                    SqlParameter p_ville = new SqlParameter() { ParameterName = "ville", Value = entity.Ville };
-                    SqlParameter p_id = new SqlParameter() { ParameterName = "id", Value = idCinema };
-                    cmd.Parameters.Add(p_nom);
-                    cmd.Parameters.Add(p_ville);
+                    cmd.CommandText = "UPDATE [Diffusion] SET [Cinema_Id] = @cinema_Id, [Film_Id] = @film_Id, [Date_Diffusion] = @dateDiffusion WHERE [Id] = @idCinema";
+                    SqlParameter p_cine = new SqlParameter() { ParameterName = "cinema_Id", Value = entity.Cinema_Id };
+                    SqlParameter p_film = new SqlParameter() { ParameterName = "film_Id", Value = entity.Film_Id };
+                    SqlParameter p_diff = new SqlParameter() { ParameterName = "dateDiffusion", Value = entity.Date_Diffusion };
+                    SqlParameter p_id = new SqlParameter() { ParameterName = "idCinema", Value = id };
+                    cmd.Parameters.Add(p_cine);
+                    cmd.Parameters.Add(p_film);
+                    cmd.Parameters.Add(p_diff);
                     cmd.Parameters.Add(p_id);
                     connection.Open();
                     cmd.ExecuteNonQuery();
                 }
             }
-        }
-
-        IEnumerable<CinemaDAL> ICinemaRepository<CinemaDAL>.GetByDiffusion(int id_movie, DateTime DateDiffusion)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerable<CinemaDAL> ICinemaRepository<CinemaDAL>.GetByFilm(int id_movie)
-        {
-            throw new NotImplementedException();
         }
     }
 }
