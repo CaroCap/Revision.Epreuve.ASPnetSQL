@@ -68,6 +68,21 @@ namespace Revision.Epreuve.DAL.RepositoriesDAO
             }
         }
 
+        public IEnumerable<DiffusionDAL> GetByCinemaID(int cinema_id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DiffusionDAL> GetByDate(DateTime date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DiffusionDAL> GetByFilmId(int film_id)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Insert(DiffusionDAL entity)
         {
             using (SqlConnection connection = new SqlConnection(_connString))

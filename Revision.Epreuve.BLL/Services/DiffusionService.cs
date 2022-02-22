@@ -34,6 +34,21 @@ namespace Revision.Epreuve.BLL.Services
 
         }
 
+        public IEnumerable<DiffusionBLL> GetByCinemaID(int cinema_id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DiffusionBLL> GetByDate(DateTime date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DiffusionBLL> GetByFilmId(int film_id)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Insert(DiffusionBLL entity)
         {
             return _diffusionRepository.Insert(entity.ToDAL());
